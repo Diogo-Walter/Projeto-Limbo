@@ -45,11 +45,15 @@ function _easeOutBack(p) {
 }
 
 function _chaoAranha(x, yRef) {
-  if (typeof chaoAbaixo === "function") {
-    const g = chaoAbaixo(x, yRef - 110);
-    if (g >= yRef - 110 && g <= yRef + 140) return g;   // degraus de até uns 100
+  let alvo = null;
+  for (const p of plataformas) {
+    if (p.passavel) continue;
+    if (typeof carrinhoMina === "object" && carrinhoMina && p === carrinhoMina.plat) continue;   // não sobe no carrinho
+    if (x < p.x || x > p.x + p.w) continue;
+    if (p.y < yRef - 110 || p.y > yRef + 140) continue;     // degraus de até uns 100 para cima
+    if (alvo === null || p.y < alvo) alvo = p.y;
   }
-  return yRef;
+  return alvo === null ? yRef : alvo;
 }
 
 // Cinemática inversa de 2 ossos: acha o joelho (sempre dobrado para cima).

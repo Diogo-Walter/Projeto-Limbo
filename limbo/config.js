@@ -5,7 +5,7 @@ const LARGURA = canvas.width;
 const ALTURA = canvas.height;
 
 const GRAVIDADE = 0.6;
-const VELOCIDADE = 3.6;
+const VELOCIDADE = 4.6;
 const FORCA_PULO = -12;
 const ESCALA = 2;
 

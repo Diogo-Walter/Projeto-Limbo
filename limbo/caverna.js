@@ -15,6 +15,7 @@ function aoReiniciar() {
   for (const p of faseAtual.plataformas) delete p.cai;
   entulho = [];
   camPisoCav = 0;
+    if (typeof reiniciarMina === "function") reiniciarMina();
 }
 
 function desmoronar(p) {
@@ -77,9 +78,12 @@ function atualizarFalsos(dt) {
   if (faseAtual.caverna) {
     const c = faseAtual.caverna;
     const dentro = jogador.y > c.poco.y + 60;
-    camPisoCav += ((dentro ? c.poco.y : 0) - camPisoCav) * Math.min(1, 0.12 * dt);
+        // na subida final (perto do portal) a câmera pode subir mais, para mostrar o arco e o teto
+    const pisoCam = jogador.x > 8300 ? 300 : c.poco.y;
+    camPisoCav += ((dentro ? pisoCam : 0) - camPisoCav) * Math.min(1, 0.12 * dt);
     if (cameraY < camPisoCav) cameraY = camPisoCav;
   }
+    if (typeof atualizarMina === "function") atualizarMina(dt);
 }
 
 function desenharEntulho() {
@@ -97,6 +101,7 @@ function desenharEntulho() {
   }
   ctx.restore();
   desenharAcabamentoCaverna();   // o jogo.js chama esta função logo depois das plataformas
+    if (faseAtual.mina && typeof desenharMina === "function") desenharMina();
 }
 
 // ---------- as rochas (teto e piso do corredor) ----------

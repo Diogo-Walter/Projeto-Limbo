@@ -358,7 +358,7 @@ const FASES = [
     nome: "Caverna",
     cenario: "floresta",
     paleta: 0,
-    fim: 8700,
+    fim: 9900,
     vertical: true,
     topo: 0,
     base: 440,
@@ -367,6 +367,7 @@ const FASES = [
     limiteQueda: 1000,
     monstro: false,
     aranha: true,                            // liga a aranha nesta fase
+    mina: { trilhoIni: 6720, trilhoFim: 8380, piso: 780, carrinhoX: 6820 },
     aranhaGatilho: { x: 3120, w: 220 },      // zona do 1º teto baixo (trecho 4)
 
     plataformas: [
@@ -401,11 +402,18 @@ const FASES = [
       ...trecho(6120, 300, 630, 790),    // 15  desce 50
       ...trecho(6420, 300, 590, 770),    // 16  respiro antes do carrinho
 
-      // --- trilho do carrinho de mina: reto, 1500 de comprimento ---
-      ...trecho(6720, 1500, 600, 780),
-      // --- saída, depois do carrinho ---
-      ...trecho(8220, 300, 600, 780),
-      { x: 8520, y: 380, w: 400, h: 700, semGrama: true },   // parede do fim
+            // --- barricada: o carrinho quebra ela ---
+      { x: 7860, y: 600, w: 50, h: 180, barricada: true, semGrama: true },
+
+      // --- saída: sobe em degraus até o portal ---
+      ...trecho(8220, 220, 600, 780),    // saída do trilho (plano)
+      ...trecho(8440, 220, 560, 730),    // sobe 50
+      ...trecho(8660, 200, 520, 680),    // sobe 50
+      ...trecho(8860, 220, 540, 720),    // desce 40
+      ...trecho(9080, 220, 480, 650),    // sobe 70
+      ...trecho(9300, 220, 440, 590),    // sobe 60
+      ...trecho(9520, 300, 400, 550),    // plataforma do portal
+      { x: 9820, y: 380, w: 400, h: 700, semGrama: true },   // parede do fim
     ],
 
     espinhos: [
@@ -420,14 +428,16 @@ const FASES = [
       { x: 5390, y: 750, w: 40, h: 20 },
       { x: 5700, y: 760, w: 60, h: 20 },    // 13
       { x: 5980, y: 720, w: 40, h: 20 },    // 14
+      { x: 8700, y: 660, w: 40, h: 20 },    // degrau 3 da subida
+      { x: 9400, y: 570, w: 40, h: 20 },    // degrau 6 da subida
       { x: 6240, y: 770, w: 60, h: 20 },    // 15
     ],
 
     // poco = a abertura no chão da floresta; fim = onde a caverna acaba;
     // fundo = até onde o vazio é desenhado
-    caverna: { poco: { x: 1500, y: 380, w: 760 }, fim: 8520, fundo: 900 },
+        caverna: { poco: { x: 1500, y: 380, w: 760 }, fim: 9820, fundo: 900 },
 
-    luz: { x: 8460, y: 690, w: 10, h: 90 },
+    luz: { x: 9760, y: 460, w: 10, h: 90 },
 
     objetos: [
       // floresta (nada em cima do chão falso, senão fica flutuando quando ele cai)
@@ -466,6 +476,13 @@ const FASES = [
       { tipo: "pedra",     x: 6300, y: 790, s: 0.9 },
       { tipo: "cogumelos", x: 6560, y: 770 },
       { tipo: "corrente",  x: 7200, y: 600, comp: 60 },   // trecho do carrinho: só correntes no teto
+            // subida final
+      { tipo: "cogumelos", x: 8480, y: 730 },
+      { tipo: "pedra",     x: 8820, y: 680, s: 0.7 },
+      { tipo: "corrente",  x: 8980, y: 540, comp: 60 },
+      { tipo: "cogumelos", x: 9180, y: 650 },
+      { tipo: "corrente",  x: 9420, y: 440, comp: 50 },
+      { tipo: "pedra",     x: 9600, y: 550, s: 0.8 },
       { tipo: "corrente",  x: 7700, y: 600, comp: 80 },
     ],
   },
