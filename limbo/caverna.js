@@ -329,7 +329,7 @@ function desenharCaverna() {
 
   // gotas caindo do teto até o piso
   ctx.fillStyle = "rgba(200,215,222,0.6)";
-  for (let k = 0; k < 14; k++) {
+  for (let k = 0; k < 40; k++) {
     const gx = 1880 + k * 241;
     if (gx < camera - 10 || gx > camera + LARGURA + 10) continue;
     const teto = tetoEm(gx);

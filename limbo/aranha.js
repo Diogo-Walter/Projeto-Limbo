@@ -12,10 +12,11 @@
 // =====================================================
 
 const ARANHA_CFG = {
-  escala: 1.25,      // tamanho geral (1 = pequena, 2 = enorme)
-  velocidade: 0,     // 0 = só surge e fica; >0 anda atrás do alvo (perseguição, depois)
-  distSurgir: 190,   // quantos px atrás do jogador ela aparece (a câmera mostra ~267 atrás)
-  tempoOlhos: 100    // quadros só com os olhos brilhando no escuro, antes de sair
+  escala: 1.25,      // tamanho geral (1 = pequena, 2 = enorme). Com 1.25 ela tem uns 120 de altura
+  velocidade: 3.0,   // o jogador anda 3.5 (e 1.4 agachado). Ela só alcança quem para ou agacha
+  distSurgir: 190,   // quantos px atrás do jogador ela aparece
+  tempoOlhos: 100,   // quadros só com os olhos brilhando antes de sair
+  distMata: 90       // a que distância (horizontal) ela pega o jogador
 };
 
 let aranhaF4 = null;
@@ -45,8 +46,8 @@ function _easeOutBack(p) {
 
 function _chaoAranha(x, yRef) {
   if (typeof chaoAbaixo === "function") {
-    const g = chaoAbaixo(x, yRef - 60);
-    if (g >= yRef - 60 && g <= yRef + 80) return g;   // só aceita chão de verdade, perto
+    const g = chaoAbaixo(x, yRef - 110);
+    if (g >= yRef - 110 && g <= yRef + 140) return g;   // degraus de até uns 100
   }
   return yRef;
 }
@@ -156,13 +157,18 @@ function surgirAranha(x, chaoY, dir) {
 // Aparece atrás do jogador, virada para ele.
 function surgirAranhaAtras(j) {
   const pes = j.y + j.h;
-  surgirAranha(j.x - ARANHA_CFG.distSurgir, pes, 1);
+  let x = j.x - ARANHA_CFG.distSurgir;
+  const c = typeof faseAtual === "object" && faseAtual.caverna;
+  if (c) x = Math.max(x, c.poco.x + 40);          // nunca antes do começo da caverna
+  surgirAranha(x, _chaoAranha(x, pes), 1);        // no chão do corredor, onde o jogador está
 }
 
 // Chame todo quadro: dispara uma única vez quando o jogador agacha dentro da zona.
 // zona = { x, w } em coordenadas do mundo.
 function gatilhoAranha(j, zona) {
   if (aranhaF4 || aranhaJaSurgiu) return;
+  const c = typeof faseAtual === "object" && faseAtual.caverna;
+  if (c && j.y + j.h < c.poco.y + 60) return;     // só aparece lá embaixo, dentro da caverna
   if (j.agachado && j.x + j.w > zona.x && j.x < zona.x + zona.w) {
     aranhaJaSurgiu = true;
     surgirAranhaAtras(j);
@@ -207,14 +213,34 @@ function atualizarAranhaF4(dt, alvo) {
     if (p >= 1) { a.estado = "viva"; a.altura = 1; a.alpha = 1; }
   }
 
+    // teto baixo: ela se achata para caber e anda mais devagar (tetoEm vem do caverna.js)
+  if (a.achata === undefined) a.achata = 1;
+  let alvoAchata = 1;
+  if (typeof tetoEm === "function") {
+    const teto = tetoEm(a.x);
+    if (teto !== null) alvoAchata = Math.max(0.38, Math.min(1, (a.y - teto - 6) / (118 * a.s)));
+  }
+  a.achata += (alvoAchata - a.achata) * Math.min(1, 0.25 * dt);
+
   let andando = false;
   if (a.estado === "viva" && alvo && ARANHA_CFG.velocidade > 0) {
-    a.dir = alvo.x > a.x ? 1 : -1;
-    a.x += a.dir * ARANHA_CFG.velocidade * dt;
+    const dx = (alvo.x + alvo.w / 2) - a.x;
+    a.dir = dx > 0 ? 1 : -1;
+    // se o jogador se afastou muito, ela acelera para não ficar para trás
+    let vel = ARANHA_CFG.velocidade + Math.min(2.5, Math.max(0, Math.abs(dx) - 320) * 0.01);
+    vel *= 0.35 + 0.65 * a.achata;               // espremida no teto baixo, anda mais devagar
+    a.x += a.dir * vel * dt;
     andando = true;
+
+    // pegou o jogador: ele morre
+    if (estado === "jogando" && Math.abs(dx) < ARANHA_CFG.distMata &&
+        Math.abs((alvo.y + alvo.h) - a.y) < 90) {
+      morrer();
+    }
   }
 
-  a.y = _chaoAranha(a.x, a.y);
+  const alvoY = _chaoAranha(a.x, a.y);
+  a.y += (alvoY - a.y) * Math.min(1, 0.35 * dt);   // sobe e desce os degraus do chão
   const bob = Math.sin(a.t * 0.12) * 1.8 * a.s;
   a.cy = a.y - 46 * a.s * a.altura + bob;
 
@@ -408,6 +434,9 @@ function desenharAranhaF4() {
   const s = a.s;
 
   ctx.save();
+
+    const k = a.achata === undefined ? 1 : a.achata;
+  if (k < 1) { ctx.translate(0, a.y); ctx.scale(1, k); ctx.translate(0, -a.y); }
 
   if (a.estado !== "olhos") {
     ctx.globalAlpha = a.alpha;

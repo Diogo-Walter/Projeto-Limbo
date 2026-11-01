@@ -227,9 +227,7 @@ const FASES = [
     fim: 800,            // a fase tem a largura da tela: a câmera não anda para os lados
     vertical: true,
     topo: -1760,         // até onde a câmera sobe
-    monstro: false,       // sem o olho nesta fase
-    aranha: true,
-    aranhaGatilho: { x: 2560, w: 220 },      
+    monstro: false,       // sem o olho nesta fase     
     rush: true,          // o monstro novo    // sem o olho nesta fase
 
     plataformas: [
@@ -349,16 +347,18 @@ const FASES = [
   ],     // fecha o array objetos
 },    
 
-  // ---------------------------------------------------
-  // FASE 4: caverna (floresta + chão falso + caverna ondulada)
-  //   Dois trechos têm teto baixo (folga 46): só passa agachado.
-  //   Precisa do caverna.js (versão nova), que desenha o fundo e as saliências.
+    // ---------------------------------------------------
+  // FASE 4: caverna (floresta, chão falso, caverna ondulada e aranha)
+  //   Floresta (x 0 a 1500), chão falso de 760 (x 1500 a 2260), poço de 420 de queda,
+  //   caverna (x 2260 a 8520). Tetos baixos (só agachado) em x 3120 e x 4460.
+  //   A aranha aparece no 1º teto baixo e persegue até o fim.
+  //   O trecho reto de x 6720 a 8220 está livre: é onde vai o carrinho de mina.
   // ---------------------------------------------------
   {
     nome: "Caverna",
     cenario: "floresta",
     paleta: 0,
-    fim: 5200,
+    fim: 8700,
     vertical: true,
     topo: 0,
     base: 440,
@@ -366,6 +366,8 @@ const FASES = [
     camVel: 0.45,
     limiteQueda: 1000,
     monstro: false,
+    aranha: true,                            // liga a aranha nesta fase
+    aranhaGatilho: { x: 3120, w: 220 },      // zona do 1º teto baixo (trecho 4)
 
     plataformas: [
       // --- floresta ---
@@ -375,46 +377,60 @@ const FASES = [
       { x: 1180, y: 340, w: 60,   h: 40,  estilo: "pedra" },
       { x: 1240, y: 300, w: 60,   h: 80,  estilo: "pedra" },
 
-      // --- o chão falso ---
-      { x: 1500, y: 380, w: 200,  h: 100, falso: true, atraso: 2 },
+      // --- o chão falso: 760 de largura, não dá para pular por cima ---
+      { x: 1500, y: 380, w: 760,  h: 100, falso: true, atraso: 2 },
 
-      // --- caverna: fundo do poço + trechos (x, largura, y do teto, y do piso) ---
-      { x: 1500, y: 800, w: 200,  h: 300, rocha: "piso", semGrama: true },
-      ...trecho(1700, 300, 620, 800),    //  1  entrada
-      ...trecho(2000, 300, 570, 750),    //  2  sobe 50 (pula)
-      ...trecho(2300, 260, 600, 780),    //  3  desce
-      ...trecho(2560, 220, 734, 780),    //  4  TETO BAIXO: agachar
-      ...trecho(2780, 300, 630, 810),    //  5  desce
-      ...trecho(3080, 270, 580, 740),    //  6  sobe 70 (pula)
-      ...trecho(3350, 250, 520, 700),    //  7  sobe 40: ponto mais alto
-      ...trecho(3600, 300, 600, 790),    //  8  desce 90
-      ...trecho(3900, 240, 744, 790),    //  9  TETO BAIXO: agachar
-      ...trecho(4140, 300, 610, 790),    // 10
-      ...trecho(4440, 260, 570, 750),    // 11  sobe 40 (pula)
-      ...trecho(4700, 300, 590, 770),    // 12  chegada
-      { x: 5000, y: 380, w: 400, h: 700, semGrama: true },   // parede do fim
+      // --- fundo do poço ---
+      { x: 1500, y: 800, w: 760,  h: 300, rocha: "piso", semGrama: true },
+
+      // --- caverna: trecho(x, largura, y do teto, y do piso) ---
+      ...trecho(2260, 300, 620, 800),    //  1  entrada
+      ...trecho(2560, 300, 570, 750),    //  2  sobe 50 (pula)
+      ...trecho(2860, 260, 600, 780),    //  3  desce
+      ...trecho(3120, 220, 734, 780),    //  4  TETO BAIXO: agachar (a aranha aparece aqui)
+      ...trecho(3340, 300, 630, 810),    //  5  desce
+      ...trecho(3640, 270, 580, 740),    //  6  sobe 70 (pula)
+      ...trecho(3910, 250, 520, 700),    //  7  sobe 40: ponto mais alto
+      ...trecho(4160, 300, 600, 790),    //  8  desce 90
+      ...trecho(4460, 240, 744, 790),    //  9  TETO BAIXO: agachar
+      ...trecho(4700, 300, 610, 790),    // 10
+      ...trecho(5000, 260, 570, 750),    // 11  sobe 40 (pula)
+      ...trecho(5260, 300, 590, 770),    // 12
+      ...trecho(5560, 300, 600, 780),    // 13  (novo)
+      ...trecho(5860, 260, 560, 740),    // 14  sobe 40 (pula)
+      ...trecho(6120, 300, 630, 790),    // 15  desce 50
+      ...trecho(6420, 300, 590, 770),    // 16  respiro antes do carrinho
+
+      // --- trilho do carrinho de mina: reto, 1500 de comprimento ---
+      ...trecho(6720, 1500, 600, 780),
+      // --- saída, depois do carrinho ---
+      ...trecho(8220, 300, 600, 780),
+      { x: 8520, y: 380, w: 400, h: 700, semGrama: true },   // parede do fim
     ],
 
     espinhos: [
-      { x: 1860, y: 780, w: 60, h: 20 },
-      { x: 2200, y: 730, w: 40, h: 20 },
-      { x: 2420, y: 760, w: 40, h: 20 },
-      { x: 2920, y: 790, w: 60, h: 20 },
-      { x: 3530, y: 680, w: 40, h: 20 },
-      { x: 3740, y: 770, w: 60, h: 20 },
-      { x: 4260, y: 770, w: 60, h: 20 },
-      { x: 4640, y: 730, w: 40, h: 20 },
-      { x: 4830, y: 750, w: 40, h: 20 },
+      { x: 2420, y: 780, w: 60, h: 20 },
+      { x: 2760, y: 730, w: 40, h: 20 },
+      { x: 2980, y: 760, w: 40, h: 20 },
+      { x: 3480, y: 790, w: 60, h: 20 },
+      { x: 4090, y: 680, w: 40, h: 20 },
+      { x: 4300, y: 770, w: 60, h: 20 },
+      { x: 4820, y: 770, w: 60, h: 20 },
+      { x: 5200, y: 730, w: 40, h: 20 },
+      { x: 5390, y: 750, w: 40, h: 20 },
+      { x: 5700, y: 760, w: 60, h: 20 },    // 13
+      { x: 5980, y: 720, w: 40, h: 20 },    // 14
+      { x: 6240, y: 770, w: 60, h: 20 },    // 15
     ],
 
     // poco = a abertura no chão da floresta; fim = onde a caverna acaba;
     // fundo = até onde o vazio é desenhado
-    caverna: { poco: { x: 1500, y: 380, w: 200 }, fim: 5000, fundo: 900 },
+    caverna: { poco: { x: 1500, y: 380, w: 760 }, fim: 8520, fundo: 900 },
 
-    luz: { x: 4940, y: 680, w: 10, h: 90 },
+    luz: { x: 8460, y: 690, w: 10, h: 90 },
 
     objetos: [
-      // floresta
+      // floresta (nada em cima do chão falso, senão fica flutuando quando ele cai)
       { tipo: "placa",     x: 170 },
       { tipo: "pedra",     x: 290, s: 1 },
       { tipo: "moita",     x: 330 },
@@ -426,21 +442,31 @@ const FASES = [
       { tipo: "corrente",  x: 1000, y: 0, comp: 120 },
       { tipo: "lanterna",  x: 1100 },
       { tipo: "galhos",    x: 1335 },
-      { tipo: "moita",     x: 1450 },
-      { tipo: "lanterna",  x: 1800 },
-      { tipo: "tronco",    x: 1900 },
-      { tipo: "lapide",    x: 2050 },
+      { tipo: "moita",     x: 1440 },
+      // o outro lado da superfície, que se vê de longe
+      { tipo: "lanterna",  x: 2330 },
+      { tipo: "tronco",    x: 2450 },
+      { tipo: "lapide",    x: 2600 },
       // caverna
-      { tipo: "cogumelos", x: 1780, y: 800 },
-      { tipo: "pedra",     x: 2100, y: 750, s: 0.8 },
-      { tipo: "corrente",  x: 2150, y: 600, comp: 60 },
-      { tipo: "cogumelos", x: 2380, y: 780 },
-      { tipo: "pedra",     x: 3200, y: 740, s: 0.8 },
-      { tipo: "corrente",  x: 3480, y: 560, comp: 50 },
-      { tipo: "cogumelos", x: 3700, y: 790 },
-      { tipo: "corrente",  x: 4300, y: 610, comp: 70 },
-      { tipo: "cogumelos", x: 4500, y: 750 },
-      { tipo: "pedra",     x: 4740, y: 770, s: 1 },
+      { tipo: "cogumelos", x: 2340, y: 800 },
+      { tipo: "pedra",     x: 2660, y: 750, s: 0.8 },
+      { tipo: "corrente",  x: 2710, y: 570, comp: 60 },
+      { tipo: "cogumelos", x: 2940, y: 780 },
+      { tipo: "pedra",     x: 3760, y: 740, s: 0.8 },
+      { tipo: "corrente",  x: 4040, y: 520, comp: 50 },
+      { tipo: "cogumelos", x: 4260, y: 790 },
+      { tipo: "corrente",  x: 4860, y: 610, comp: 70 },
+      { tipo: "cogumelos", x: 5060, y: 750 },
+      { tipo: "pedra",     x: 5300, y: 770, s: 1 },
+      { tipo: "cogumelos", x: 5650, y: 780 },
+      { tipo: "pedra",     x: 5780, y: 780, s: 0.8 },
+      { tipo: "corrente",  x: 5960, y: 560, comp: 60 },
+      { tipo: "cogumelos", x: 6020, y: 740 },
+      { tipo: "corrente",  x: 6250, y: 630, comp: 70 },
+      { tipo: "pedra",     x: 6300, y: 790, s: 0.9 },
+      { tipo: "cogumelos", x: 6560, y: 770 },
+      { tipo: "corrente",  x: 7200, y: 600, comp: 60 },   // trecho do carrinho: só correntes no teto
+      { tipo: "corrente",  x: 7700, y: 600, comp: 80 },
     ],
   },
   
