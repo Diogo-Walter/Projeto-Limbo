@@ -367,7 +367,7 @@ const FASES = [
     limiteQueda: 1000,
     monstro: false,
     aranha: true,                            // liga a aranha nesta fase
-    mina: { trilhoIni: 6720, trilhoFim: 8380, piso: 780, carrinhoX: 6820 },
+    carrinho: { trilhoIni: 6720, trilhoFim: 8380, piso: 780, carrinhoX: 6820 },
     aranhaGatilho: { x: 3120, w: 220 },      // zona do 1º teto baixo (trecho 4)
 
     plataformas: [
@@ -436,6 +436,7 @@ const FASES = [
     // poco = a abertura no chão da floresta; fim = onde a caverna acaba;
     // fundo = até onde o vazio é desenhado
         caverna: { poco: { x: 1500, y: 380, w: 760 }, fim: 9820, fundo: 900 },
+            carrinho: { trilhoIni: 6720, trilhoFim: 8220, piso: 780, carrinhoX: 6800 },
 
     luz: { x: 9760, y: 460, w: 10, h: 90 },
 

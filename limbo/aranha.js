@@ -35,12 +35,13 @@ const _A_OLHOS = [
 
 // ---------- utilidades ----------
 function _aranhaRand(seed) {
-  const h = Math.sin(seed * 12.9898) * 43758.5453;
+  const h = Math.sin(seed * 12.9898) * 43758.5453; // A função usa uma semente multiplica por um valor e calcula o seno para
+  //  gerar um resultado pseudo aleatório e consistente garantindo padrões de detalhes únicos 
   return h - Math.floor(h);
 }
 
 function _easeOutBack(p) {
-  const c1 = 1.9, c3 = c1 + 1;
+  const c1 = 1.9, c3 = c1 + 1;// Esse Outback cria um efeito elástico que faz a aranha ultrapassar o ponto de destino e depois voltar simulando peso e impacto
   return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2);
 }
 
@@ -58,16 +59,16 @@ function _chaoAranha(x, yRef) {
 
 // Cinemática inversa de 2 ossos: acha o joelho (sempre dobrado para cima).
 function _ikAranha(hx, hy, fx, fy, l1, l2) {
-  const dx = fx - hx, dy = fy - hy;
-  const d = Math.hypot(dx, dy) || 0.001;
-  const dd = Math.max(Math.abs(l1 - l2) + 0.5, Math.min(l1 + l2 - 0.5, d));
-  const ux = dx / d, uy = dy / d;
-  const al = (l1 * l1 - l2 * l2 + dd * dd) / (2 * dd);
-  const h = Math.sqrt(Math.max(0, l1 * l1 - al * al));
-  const mx = hx + ux * al, my = hy + uy * al;
-  const k1 = { x: mx - uy * h, y: my + ux * h };
-  const k2 = { x: mx + uy * h, y: my - ux * h };
-  const k = k1.y < k2.y ? k1 : k2;
+  const dx = fx - hx, dy = fy - hy; //distancia horizontal
+  const d = Math.hypot(dx, dy) || 0.001; // distancia entre aranha e o jogador
+  const dd = Math.max(Math.abs(l1 - l2) + 0.5, Math.min(l1 + l2 - 0.5, d)); // distancia vertical entre aranha e jogador
+  const ux = dx / d, uy = dy / d; // direcao horizontal, indicando se o jogador esta a esquerda ou a direita
+  const al = (l1 * l1 - l2 * l2 + dd * dd) / (2 * dd); // limite de aceleracao
+  const h = Math.sqrt(Math.max(0, l1 * l1 - al * al)); // O H representa um valor intermediário utilizado no cálculo da semente para gerar resultados pseudoaleatórios 
+  const mx = hx + ux * al, my = hy + uy * al;// limite maximo da coordenada x para a aranha n sair da tela
+  const k1 = { x: mx - uy * h, y: my + ux * h }; //multiplicar para ajustar a velocidade do movimento horizontal da aranha 
+  const k2 = { x: mx + uy * h, y: my - ux * h }; // multiplicador para ajustar a velocidade vertical da aranha
+  const k = k1.y < k2.y ? k1 : k2; // multiplicador geral para ajustar todo o movimento da arnha
   return { kx: k.x, ky: k.y, ex: hx + ux * dd, ey: hy + uy * dd };
 }
 
@@ -75,7 +76,7 @@ function _ikAranha(hx, hy, fx, fy, l1, l2) {
 function _afilado(x1, y1, x2, y2, w1, w2) {
   const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy) || 1;
   const nx = -dy / d, ny = dx / d;
-  ctx.beginPath();
+  ctx.beginPath(); 
   ctx.moveTo(x1 + nx * w1 / 2, y1 + ny * w1 / 2);
   ctx.lineTo(x2 + nx * w2 / 2, y2 + ny * w2 / 2);
   ctx.lineTo(x2 - nx * w2 / 2, y2 - ny * w2 / 2);
